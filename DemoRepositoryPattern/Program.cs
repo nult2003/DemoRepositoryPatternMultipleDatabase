@@ -1,6 +1,7 @@
 using DemoRepositoryPattern.Data;
 using DemoRepositoryPattern.Interfaces;
-using DemoRepositoryPattern.Repositories;
+using DemoRepositoryPattern.Middleware;
+using DemoRepositoryPattern.Services;
 using DemoRepositoryPattern.UnitOfWorks;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -15,24 +16,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Add DbContext
+builder.Services.AddDbContext<AppDbContext>();
+builder.Services.AddUnitOfWork<AppDbContext>();
 
-
-//builder.Services.AddDbContext<AppDbContextSqlServer>();
-//builder.Services.AddScoped<DbContext, AppDbContextSqlServer>();
-
-//builder.Services.AddDbContext<AppDbContextMySql>();
-//builder.Services.AddScoped<DbContext, AppDbContextMySql>();
-
-builder.Services.AddDbContext<AppDbContextPostGre>();
-builder.Services.AddScoped<DbContext, AppDbContextPostGre>();
 
 #region Repositories
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 #endregion
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 var app = builder.Build();
-
+app.UseMyMiddlewareCheckDb();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -45,5 +38,4 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.Run();
